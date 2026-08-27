@@ -1,0 +1,145 @@
+<?php
+
+/**
+ * @file
+ * LocalGov Microsites Group install file.
+ */
+
+use Drupal\Core\Config\ConfigManagerInterface;
+use Drupal\group\Entity\Group;
+use Drupal\search_api\Entity\Index;
+
+/**
+ * Implements hook_install().
+ */
+function localgov_microsites_group_install($is_syncing) {
+
+  if ($is_syncing) {
+    return;
+  }
+
+  // Group sites should be installed aleady. It provides configuration, so we
+  // can't, but must update its default config.
+  $group_sites = \Drupal::configFactory()->getEditable('group_sites.settings');
+  $group_sites->set('context_provider', '@group_context_domain.group_from_domain_context:group');
+  $group_sites->set('no_site_access_policy', 'localgov_microsites_group.control_site_access_policy');
+  $group_sites->set('site_access_policy', 'localgov_microsites_group.microsite_content_types_access_policy');
+  $group_sites->save();
+
+  // Add domain access to exclude other sites results.
+  $index = Index::load('localgov_sitewide_search');
+  $processor = \Drupal::getContainer()
+    ->get('search_api.plugin_helper')
+    ->createProcessorPlugin($index, 'domain_group_entity_access');
+  $index->addProcessor($processor);
+  $index->save();
+}
+
+/**
+ * Implements hook_update_last_removed().
+ */
+function localgov_microsites_group_update_last_removed() {
+  return 9003;
+}
+
+/**
+ * Migrate microsite domains to group_context_domain from domain_group.
+ */
+function localgov_microsites_group_update_9004() {
+  foreach (\Drupal::entityTypeManager()->getStorage('domain')->loadMultiple() as $domain) {
+    if (
+      ($group_id = $domain->getThirdPartySetting('domain_group', 'group')) &&
+      ($group = Group::load($group_id))
+    ) {
+      $domain->setThirdPartySetting('group_context_domain', 'group_uuid', $group->uuid());
+      $domain->unsetThirdPartySetting('domain_group', 'group');
+      $domain->save();
+    }
+  }
+}
+
+/**
+ * Update configuration dependencies.
+ */
+function localgov_microsites_group_update_9005() {
+  $config_manager = \Drupal::service('config.manager');
+  assert($config_manager instanceof ConfigManagerInterface);
+  // $config_manager->loadConfigEntityByName('')
+  $dependencies = $config_manager->findConfigEntityDependencies('module', ['domain_group']);
+  foreach ($dependencies as $name => $dependency) {
+    $config = $config_manager->loadConfigEntityByName($name);
+    $config->save();
+  }
+}
+
+/**
+ * Remove any group permissions entities before removing the module.
+ */
+function localgov_microsites_group_update_9006() {
+  $permission_storage = \Drupal::entityTypeManager()->getStorage('group_permission');
+  if ($permissions = $permission_storage->loadMultiple()) {
+    $permission_storage->delete($permissions);
+  }
+}
+
+/**
+ * Disable domain_group and group_permissions.
+ */
+function localgov_microsites_group_update_9007() {
+  \Drupal::service('module_installer')->uninstall(['domain_group', 'group_permissions']);
+}
+
+/**
+ * Set group sites context as would be done on install.
+ */
+function localgov_microsites_group_update_9008() {
+  $group_sites = \Drupal::configFactory()->getEditable('group_sites.settings');
+  $group_sites->set('context_provider', '@group_context_domain.group_from_domain_context:group');
+  $group_sites->save();
+}
+
+/**
+ * Switch to new custom group sites access handlers.
+ */
+function localgov_microsites_group_update_9009() {
+  $group_sites = \Drupal::configFactory()->getEditable('group_sites.settings');
+  $group_sites->set('no_site_access_policy', 'localgov_microsites_group.control_site_access_policy');
+  $group_sites->set('site_access_policy', 'localgov_microsites_group.microsite_content_types_access_policy');
+  $group_sites->save();
+}
+
+/**
+ * Uninstall variationcache module.
+ */
+function localgov_microsites_group_update_10001(&$sandbox) {
+  \Drupal::service('module_installer')->uninstall(['variationcache']);
+}
+
+/**
+ * Removes the retired localgov_sa11y permission from the trusted editor role.
+ *
+ * Only runs where localgov_sa11y is no longer installed. Sites that still have
+ * it installed are left untouched; Drupal's own Role::onDependencyRemoval()
+ * handles cleanup when they eventually uninstall that module.
+ */
+function localgov_microsites_group_update_10002(): void {
+  // Leave sa11y sites untouched (acceptance criterion 3).
+  if (\Drupal::moduleHandler()->moduleExists('localgov_sa11y')) {
+    return;
+  }
+
+  /** @var \Drupal\user\RoleInterface|null $role */
+  $role = \Drupal::entityTypeManager()
+    ->getStorage('user_role')
+    ->load('microsites_trusted_editor');
+
+  if ($role === NULL) {
+    // Role does not exist on this site; nothing to do.
+    return;
+  }
+
+  $role->revokePermission('use_localgov_sa11y');
+  // save() triggers calculateDependencies(), which removes the now-absent
+  // localgov_sa11y module entry from dependencies.module automatically.
+  $role->save();
+}

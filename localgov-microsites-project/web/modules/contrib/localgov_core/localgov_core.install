@@ -1,0 +1,226 @@
+<?php
+
+/**
+ * @file
+ * Update hook implementations.
+ */
+
+use Drupal\Core\Config\FileStorage;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\localgov_core\FieldRenameHelper;
+
+/**
+ * Implements hook_install().
+ */
+function localgov_core_install(): void {
+  _localgov_core_ensure_body_field_storage();
+  _localgov_core_enabled_views_page_display_extender();
+  _localgov_core_ensure_node_search_view_modes_present();
+}
+
+/**
+ * Update Field names for localgov_core provided fields.
+ *
+ * Field mapping between existing and new names:
+ * field_email_address => localgov_email_address
+ * field_facebook      => localgov_facebook
+ * field_phone         => localgov_phone
+ * field_twitter       => localgov_twitter.
+ *
+ * This change creates and updates Drupal config entities.  Unless configuration
+ * is *exported* after this update, later calls to 'drush deploy' or similar
+ * will revert these changes.
+ */
+function localgov_core_update_8001(&$sandbox) {
+
+  // Update field_ types fields provided by localgov_core.
+  $field_names = ['email_address', 'facebook', 'phone', 'twitter'];
+  foreach ($field_names as $field_name_unprefixed) {
+    FieldRenameHelper::renameField('field_' . $field_name_unprefixed, 'localgov_' . $field_name_unprefixed, 'node');
+  }
+
+  return t('Please export your sites configuration! Config entities for localgov_core where updated.');
+}
+
+/**
+ * Update node type conditions from node_type to entity_bundle.
+ *
+ * @see pathauto_update_8108()
+ * This runs the same update for any sites that installed our default pathauto
+ * patters after the pathauto update was added.
+ */
+function localgov_core_update_8002() {
+  // Load all pattern configuration entities.
+  foreach (\Drupal::configFactory()->listAll('pathauto.pattern.') as $pattern_config_name) {
+    $pattern_config = \Drupal::configFactory()->getEditable($pattern_config_name);
+
+    // Loop patterns and swap the node_type plugin by the entity_bundle:node
+    // plugin.
+    if ($pattern_config->get('type') === 'canonical_entities:node') {
+      $selection_criteria = $pattern_config->get('selection_criteria');
+      foreach ($selection_criteria as $uuid => $condition) {
+        if ($condition['id'] === 'node_type') {
+          $pattern_config->set("selection_criteria.$uuid.id", 'entity_bundle:node');
+          $pattern_config->save();
+          break;
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Add a localgov_card view mode.
+ */
+function localgov_core_update_8003() {
+  $view_mode = \Drupal::entityTypeManager()->getStorage('entity_view_mode')->load('node.localgov_card');
+  if (!$view_mode) {
+    $view_mode = \Drupal::entityTypeManager()->getStorage('entity_view_mode')->create([
+      'id' => 'node.localgov_card',
+      'targetEntityType' => 'node',
+      'status' => TRUE,
+      'label' => 'LocalGov Card',
+    ]);
+    $view_mode->save();
+  }
+}
+
+/**
+ * Update the files view to change the path and menu type for the 'page_1'.
+ */
+function localgov_core_update_8004() {
+  // Load the view configuration.
+  $config = \Drupal::configFactory()->getEditable('views.view.files');
+
+  // Set the configuration values using an array.
+  $config->set('display.page_1.display_options.path', 'admin/content/media/files');
+  $config_files_menu_items = $config->get('display.page_1.display_options.menu');
+  $config_files_menu_items['type'] = 'none';
+  $config_files_menu_items['expanded'] = 'false';
+  $config_files_menu_items['parent'] = '';
+  $config_files_menu_items['context'] = '0';
+  $config->set('display.page_1.display_options.menu', $config_files_menu_items);
+
+  $config->set('display.page_2.display_options.path', 'admin/content/media/files/usage/%');
+
+  // Save the configuration.
+  $config->save();
+}
+
+/**
+ * Enables the views page header display extender.
+ */
+function localgov_core_update_8005(): void {
+  _localgov_core_enabled_views_page_display_extender();
+}
+
+/**
+ * Enable localgov_page_header_display_extender plugin.
+ */
+function _localgov_core_enabled_views_page_display_extender(): void {
+  $config = \Drupal::service('config.factory')->getEditable('views.settings');
+  $display_extenders = $config->get('display_extenders') ?: [];
+  $display_extenders[] = 'localgov_page_header_display_extender';
+  $config->set('display_extenders', $display_extenders);
+  $config->save();
+}
+
+/**
+ * Ensure the node body field storage exists.
+ *
+ * Since Drupal 11.3, the body field storage is no longer provided by core.
+ * The config is in config/optional so it does not conflict with profiles that
+ * already provide it (e.g. standard). This function ensures the field storage
+ * is created when optional config has not been installed.
+ */
+function _localgov_core_ensure_body_field_storage(): void {
+  if (!FieldStorageConfig::loadByName('node', 'body')) {
+    FieldStorageConfig::create([
+      'field_name' => 'body',
+      'entity_type' => 'node',
+      'type' => 'text_with_summary',
+      'cardinality' => 1,
+      'translatable' => TRUE,
+      'settings' => [],
+      'module' => 'text',
+      'locked' => FALSE,
+      'persist_with_no_fields' => TRUE,
+      'custom_storage' => FALSE,
+    ])->save();
+  }
+}
+
+/**
+ * Create field.storage.node.localgov_summary if not already present.
+ */
+function localgov_core_update_8006(): void {
+
+  $module_path = \Drupal::getContainer()
+    ->get('module_handler')
+    ->getModule('localgov_core')
+    ->getPath();
+
+  $install_dir = new FileStorage($module_path . '/config/install/');
+
+  $config_to_create = [
+    'field.storage.node.localgov_summary',
+  ];
+
+  foreach ($config_to_create as $config_name) {
+    $data = $install_dir->read($config_name);
+    if (!$data) {
+      continue;
+    }
+
+    $config_obj = \Drupal::configFactory()->getEditable($config_name);
+    if (!$config_obj->isNew()) {
+      continue;
+    }
+
+    if (str_starts_with($config_name, 'field.storage.')) {
+      \Drupal::entityTypeManager()
+        ->getStorage('field_storage_config')
+        ->createFromStorageRecord($data)
+        ->save();
+    }
+  }
+  Drupal::logger('localgov_core')->notice("Created localgov_summary field storage configuration.");
+
+}
+
+/**
+ * Ensure the view modes provided for node search result and index exist.
+ *
+ * Since Drupal 11.4, these are no longer provided by core node module.
+ * The config is in config/optional so it does not conflict if the module
+ * search_node which is a sub module of core search, has been enabled.
+ * This function ensures the view modes are created when optional config
+ * has not been installed.
+ */
+function _localgov_core_ensure_node_search_view_modes_present(): void {
+
+  $module_path = \Drupal::getContainer()
+    ->get('module_handler')
+    ->getModule('localgov_core')
+    ->getPath();
+
+  $optional_dir = new FileStorage($module_path . '/config/optional/');
+
+  $configs = [
+    'core.entity_view_mode.node.search_index',
+    'core.entity_view_mode.node.search_result',
+  ];
+  foreach ($configs as $config_name) {
+
+    $data = $optional_dir->read($config_name);
+    if (!$data) {
+      continue;
+    }
+
+    $config_obj = \Drupal::configFactory()->getEditable($config_name);
+    if (!$config_obj->isNew()) {
+      continue;
+    }
+    $config_obj->setData($data)->save();
+  }
+}

@@ -1,0 +1,10 @@
+name: LocalGov Microsites Colour Picker Fields
+type: module
+description: Adds a colour picker to certain fields on LGD Microsites.
+package: LocalGov
+core_version_requirement: ^10 || ^11
+
+# Information added by Drupal.org packaging script on 2025-12-01
+version: '1.1.0-beta4'
+project: 'localgov_microsites_colour_picker_fields'
+datestamp: 1764605049

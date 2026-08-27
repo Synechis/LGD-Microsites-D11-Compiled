@@ -1,0 +1,13 @@
+name: 'LocalGov Micosites Roles Test'
+type: module
+description: 'Support module for LocalGov Microsites role tests'
+package: Testing
+core_version_requirement: ^9 || ^10 || ^11
+dependencies:
+  - localgov_microsites_group:localgov_microsites_group
+hidden: true
+
+# Information added by Drupal.org packaging script on 2026-07-23
+version: '4.6.1'
+project: 'localgov_microsites_group'
+datestamp: 1784816709

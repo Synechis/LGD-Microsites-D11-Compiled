@@ -1,0 +1,18 @@
+services:
+  gnode.route_subscriber:
+    class: 'Drupal\gnode\Routing\RouteSubscriber'
+    tags:
+      - { name: 'event_subscriber' }
+
+  # Group relation plugin handlers.
+  group.relation_handler.permission_provider.group_node:
+    class: 'Drupal\gnode\Plugin\Group\RelationHandler\GroupNodePermissionProvider'
+    arguments: ['@group.relation_handler.permission_provider']
+
+  # Decorating the node preview access check service.
+  gnode.access_check.node.preview.decorator:
+    class: Drupal\gnode\Access\NodePreviewAccessCheck
+    decorates: access_check.node.preview
+    decoration_priority: 10
+    public: false
+    arguments: ['@gnode.access_check.node.preview.decorator.inner', '@entity_type.manager', '@group_relation_type.manager', '@tempstore.private']

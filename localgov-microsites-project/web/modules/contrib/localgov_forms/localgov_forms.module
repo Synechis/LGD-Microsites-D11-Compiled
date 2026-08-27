@@ -1,0 +1,168 @@
+<?php
+
+/**
+ * @file
+ * Hook implementations.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
+
+/**
+ * Implements hook_theme().
+ */
+function localgov_forms_theme(): array {
+  return [
+    // Form element: localgov_webform_uk_address.
+    'localgov_forms_uk_address_lookup' => [
+      'render element' => 'element',
+    ],
+    // Form element: webform_uk_address.
+    'localgov_forms_uk_address' => [
+      'render element' => 'element',
+    ],
+  ];
+}
+
+/**
+ * Prepares variables for the Address lookup element template.
+ *
+ * Makes sub-elements available within the `content` variable.  Mostly lifted
+ * from _template_preprocess_webform_composite().
+ */
+function template_preprocess_localgov_forms_uk_address_lookup(array &$variables): void {
+
+  $element = $variables['element'];
+  foreach (Element::children($element) as $key) {
+    if (!isset($element[$key]['#access']) || $element[$key]['#access']) {
+      $variables['content'][$key] = $element[$key];
+    }
+  }
+
+  $variables['flexbox'] = $element['#flexbox'] ?? FALSE;
+}
+
+/**
+ * Prepares variables for the UK address element template.
+ */
+function template_preprocess_localgov_forms_uk_address(array &$variables): void {
+
+  template_preprocess_localgov_forms_uk_address_lookup($variables);
+}
+
+/**
+ * Implements hook_preprocess_hook() for hook_preprocess_webform().
+ */
+function localgov_forms_preprocess_webform(array &$variables): void {
+  $variables['#attached']['library'][] = 'localgov_forms/localgov_forms.form_errors';
+}
+
+/**
+ * Implements hook_webform_element_alter().
+ */
+function localgov_forms_webform_element_alter(array &$element, FormStateInterface $form_state, array $context): void {
+
+  // For localgov_forms_two_decimal.
+  if (($element['#type'] ?? '') === 'number' && !empty($element['#localgov_forms_two_decimal'])) {
+    $element['#attributes']['data-two-decimal'] = 'true';
+    // Force #step (server-side validation) and the HTML attribute to match,
+    // so a conflicting step set in the element settings doesn't cause cryptic
+    // validation failures after the JS has already accepted the input.
+    $element['#step'] = 0.01;
+    $element['#attributes']['step'] = '0.01';
+    $element['#attributes']['inputmode'] = 'decimal';
+    $element['#attached']['library'][] = 'localgov_forms/localgov_forms_two_decimal';
+    // Core's Number element casts the submitted value to a plain number
+    // during validation, discarding any trailing zeros the JS added
+    // client-side. Re-apply fixed 2-decimal formatting after that runs so
+    // the stored value keeps the format, not just the displayed one.
+    $element['#element_validate'][] = 'localgov_forms_two_decimal_validate';
+  }
+
+  // For localgov_forms_counter_aria.
+  if (!empty($element['#counter_type'])) {
+    $element['#attached']['library'][] = 'localgov_forms/localgov_forms_counter_aria';
+  }
+
+}
+
+/**
+ * Implements hook_webform_element_default_properties_alter().
+ */
+function localgov_forms_webform_element_default_properties_alter(array &$properties, array &$definition): void {
+  if ($definition['id'] !== 'number') {
+    return;
+  }
+  $properties['localgov_forms_two_decimal'] = FALSE;
+}
+
+/**
+ * Implements hook_webform_element_configuration_form_alter().
+ */
+function localgov_forms_webform_element_configuration_form_alter(array &$form, FormStateInterface $form_state): void {
+  /** @var \Drupal\webform_ui\Form\WebformUiElementEditForm $form_object */
+  $form_object = $form_state->getFormObject();
+  $element_plugin = $form_object->getWebformElementPlugin();
+
+  if (!$element_plugin->hasProperty('localgov_forms_two_decimal')) {
+    return;
+  }
+
+  $form['localgov_forms'] = [
+    '#type' => 'details',
+    '#title' => t('LocalGov Forms'),
+    '#open' => TRUE,
+    // After all core fieldsets (weight -20).
+    '#weight' => -10,
+  ];
+  $form['localgov_forms']['localgov_forms_two_decimal'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Two decimal places'),
+    '#description' => t('Constrain input to two decimal places and normalise on blur/submit. Forces step to 0.01.'),
+    // #default_value is auto-populated upstream — do not set it here.
+  ];
+
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for webform_ui_element_form.
+ */
+function localgov_forms_form_webform_ui_element_form_alter(array &$form, FormStateInterface $form_state): void {
+  /** @var \Drupal\webform_ui\Form\WebformUiElementEditForm $form_object */
+  $form_object = $form_state->getFormObject();
+  if (!method_exists($form_object, 'getWebformElementPlugin')) {
+    return;
+  }
+  $element_plugin = $form_object->getWebformElementPlugin();
+  if (!$element_plugin->hasProperty('localgov_forms_two_decimal')) {
+    return;
+  }
+
+  // The step field may be directly under number or inside number_container
+  // depending on whether min/max/step are all numeric.
+  $states = [
+    'disabled' => [
+      ':input[name="properties[localgov_forms_two_decimal]"]' => ['checked' => TRUE],
+    ],
+  ];
+  if (isset($form['properties']['number']['number_container']['step'])) {
+    $form['properties']['number']['number_container']['step']['#states'] = $states;
+  }
+  elseif (isset($form['properties']['number']['step'])) {
+    $form['properties']['number']['step']['#states'] = $states;
+  }
+}
+
+/**
+ * Element validate callback: re-applies two-decimal formatting.
+ *
+ * Runs after core's Number::validateNumber(), which has already cast the
+ * value to a plain float and stripped trailing zeros.
+ */
+function localgov_forms_two_decimal_validate(array &$element, FormStateInterface $form_state): void {
+  $value = $form_state->getValue($element['#parents']);
+  if ($value === '' || $value === NULL) {
+    return;
+  }
+  $form_state->setValueForElement($element, number_format((float) $value, 2, '.', ''));
+}

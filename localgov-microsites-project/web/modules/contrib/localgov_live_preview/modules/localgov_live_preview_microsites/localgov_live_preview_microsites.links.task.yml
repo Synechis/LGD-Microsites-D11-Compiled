@@ -1,0 +1,12 @@
+localgov_live_preview_microsites.edit_design:
+  route_name: entity.node.group_live_preview
+  title: 'Edit Microsite Design'
+  base_route: entity.node.canonical
+  weight: 100
+  options:
+    attributes:
+      class:
+        - edit-microsite-design
+  cache_contexts:
+    - url.site
+  class: '\Drupal\localgov_live_preview_microsites\Plugin\Menu\LivePreviewLocalTask'

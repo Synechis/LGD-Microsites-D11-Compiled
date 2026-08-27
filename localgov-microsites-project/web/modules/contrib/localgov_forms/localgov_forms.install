@@ -1,0 +1,144 @@
+<?php
+
+/**
+ * @file
+ * LocalGov Forms install file.
+ */
+
+use Drupal\Component\Serialization\Yaml;
+use Drupal\Core\Site\Settings;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\webform\Entity\WebformOptions;
+
+/**
+ * Webform configuration overrides and additions applied by LocalGov Forms.
+ */
+function localgov_forms_webform_config(): array {
+  return [
+    'webform_config_overrides' => [
+      'settings.default_ajax' => TRUE,
+      'settings.default_ajax_progress_type' => 'fullscreen',
+      'settings.default_ajax_effect' => 'none',
+      'settings.default_form_submit_once' => TRUE,
+      'settings.default_form_disable_back' => TRUE,
+      'settings.default_form_unsaved' => TRUE,
+      'settings.default_submission_log' => TRUE,
+      'settings.default_confirmation_message' => 'Thank you, your form has been successfully submitted.',
+      'settings.default_wizard_prev_button_label' => 'Previous',
+      'settings.default_wizard_next_button_label' => 'Next',
+      'settings.default_preview_prev_button_label' => 'Previous',
+    ],
+    'webform_config_additions' => [
+      'element.excluded_elements.address' => 'address',
+      'element.excluded_elements.color' => 'color',
+      'element.excluded_elements.date' => 'date',
+      'element.excluded_elements.datelist' => 'datelist',
+      'element.excluded_elements.datetime' => 'datetime',
+      'element.excluded_elements.entity_autocomplete' => 'entity_autocomplete',
+      'element.excluded_elements.item' => 'item',
+      'element.excluded_elements.label' => 'label',
+      'element.excluded_elements.language_select' => 'language_select',
+      'element.excluded_elements.machine_name' => 'machine_name',
+      'element.excluded_elements.managed_file' => 'managed_file',
+      'element.excluded_elements.range' => 'range',
+      'element.excluded_elements.search' => 'search',
+      'element.excluded_elements.table' => 'table',
+      'element.excluded_elements.tableselect' => 'tableselect',
+      'element.excluded_elements.value' => 'value',
+      'element.excluded_elements.vertical_tabs' => 'vertical_tabs',
+      'element.excluded_elements.webform_address' => 'webform_address',
+      'element.excluded_elements.webform_audio_file' => 'webform_audio_file',
+      'element.excluded_elements.webform_autocomplete' => 'webform_autocomplete',
+      'element.excluded_elements.webform_codemirror' => 'webform_codemirror',
+      'element.excluded_elements.webform_contact' => 'webform_contact',
+      'element.excluded_elements.webform_document_file' => 'webform_document_file',
+      'element.excluded_elements.webform_email_confirm' => 'webform_email_confirm',
+      'element.excluded_elements.webform_email_multiple' => 'webform_email_multiple',
+      'element.excluded_elements.webform_entity_checkboxes' => 'webform_entity_checkboxes',
+      'element.excluded_elements.webform_entity_radios' => 'webform_entity_radios',
+      'element.excluded_elements.webform_entity_select' => 'webform_entity_select',
+      'element.excluded_elements.webform_height' => 'webform_height',
+      'element.excluded_elements.webform_image_file' => 'webform_image_file',
+      'element.excluded_elements.webform_likert' => 'webform_likert',
+      'element.excluded_elements.webform_link' => 'webform_link',
+      'element.excluded_elements.webform_location_places' => 'webform_location_places',
+      'element.excluded_elements.webform_mapping' => 'webform_mapping',
+      'element.excluded_elements.webform_more' => 'webform_more',
+      'element.excluded_elements.webform_name' => 'webform_name',
+      'element.excluded_elements.webform_rating' => 'webform_rating',
+      'element.excluded_elements.webform_same' => 'webform_same',
+      'element.excluded_elements.webform_scale' => 'webform_scale',
+      'element.excluded_elements.webform_section' => 'webform_section',
+      'element.excluded_elements.webform_signature' => 'webform_signature',
+      'element.excluded_elements.webform_table' => 'webform_table',
+      'element.excluded_elements.webform_table_row' => 'webform_table_row',
+      'element.excluded_elements.webform_table_sort' => 'webform_table_sort',
+      'element.excluded_elements.webform_tableselect_sort' => 'webform_tableselect_sort',
+      'element.excluded_elements.webform_telephone' => 'webform_telephone',
+      'element.excluded_elements.webform_term_checkboxes' => 'webform_term_checkboxes',
+      'element.excluded_elements.webform_term_select' => 'webform_term_select',
+      'element.excluded_elements.webform_terms_of_service' => 'webform_terms_of_service',
+      'element.excluded_elements.webform_time' => 'webform_time',
+      'element.excluded_elements.webform_variant' => 'webform_variant',
+      'element.excluded_elements.webform_video_file' => 'webform_video_file',
+    ],
+  ];
+}
+
+/**
+ * Applies LocalGov Forms overrides and additions to webform.settings.
+ */
+function localgov_forms_apply_webform_config(): void {
+  $webform_config = localgov_forms_webform_config();
+
+  $settings = \Drupal::configFactory()->getEditable('webform.settings');
+
+  foreach ($webform_config['webform_config_overrides'] as $key => $value) {
+    $settings->set($key, $value);
+  }
+
+  foreach ($webform_config['webform_config_additions'] as $key => $value) {
+    if ($settings->get($key) === NULL) {
+      $settings->set($key, $value);
+    }
+  }
+
+  $settings->save();
+}
+
+/**
+ * Implements hook_install().
+ */
+function localgov_forms_install($is_syncing): void {
+  $skip_webform_config = Settings::get('localgov_forms_skip_webform_config', FALSE);
+
+  if ($is_syncing || $skip_webform_config) {
+    return;
+  }
+
+  localgov_forms_apply_webform_config();
+}
+
+/**
+ * Implements hook_update_N().
+ *
+ * Creates a Webform option for Local custodian codes.
+ */
+function localgov_forms_update_8001(): ?TranslatableMarkup {
+
+  $has_local_custodian_codes_option = Drupal::service('entity_type.manager')->getStorage('webform_options')->load('local_custodian_codes_gb');
+  if ($has_local_custodian_codes_option) {
+    return t('Skipping creating the Local custodian codes (GB) Webform option.  It already exists.');
+  }
+
+  $has_staged_local_custodian_codes_option_config = Drupal::service('config.storage.sync')->read('webform.webform_options.local_custodian_codes_gb');
+  if ($has_staged_local_custodian_codes_option_config) {
+    return t('Skipping creating the Local custodian codes (GB) Webform option.  A staged config file is already present.  Expecting that this staged config file will be imported soon.');
+  }
+
+  $local_custodian_codes_option = Yaml::decode(file_get_contents(__DIR__ . '/config/install/webform.webform_options.local_custodian_codes_gb.yml'));
+  $new_local_custodian_codes_option = WebformOptions::create($local_custodian_codes_option);
+  $new_local_custodian_codes_option->save();
+
+  return NULL;
+}

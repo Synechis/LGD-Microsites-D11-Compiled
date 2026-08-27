@@ -1,0 +1,16 @@
+name: LocalgGov Microsites Group Term UI
+type: module
+description: Provides a UI for the Group Term module for use with LocalGov Microsites.
+package: LocalGov Drupal
+core_version_requirement: ^9 || ^10 || ^11
+dependencies:
+  - drupal:taxonomy
+  - drupal:views
+  - group:group
+  - group_term:group_term
+  - localgov_microsites_group:localgov_microsites_group
+
+# Information added by Drupal.org packaging script on 2026-07-23
+version: '4.6.1'
+project: 'localgov_microsites_group'
+datestamp: 1784816709

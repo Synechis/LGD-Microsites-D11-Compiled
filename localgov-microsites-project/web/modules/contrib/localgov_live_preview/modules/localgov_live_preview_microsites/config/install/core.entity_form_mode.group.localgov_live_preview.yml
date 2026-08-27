@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - group
+id: group.localgov_live_preview
+label: 'Live Preview'
+description: 'Adds a form mode that we can use in the off_canvas dialog when doing live previews.'
+targetEntityType: group
+cache: true

@@ -1,0 +1,45 @@
+localgov_forms_uk_address:
+  css:
+    theme:
+      css/localgov_forms_uk_address.css: {}
+  dependencies:
+    - webform/webform.composite
+
+localgov_forms.form_errors:
+  js:
+    js/form_errors.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/once
+
+localgov_forms.address_select:
+  js:
+    js/address_select.js: {}
+  dependencies:
+    - localgov_forms/localgov_forms.address_change
+    - core/drupal
+    - core/once
+    - core/jquery
+
+localgov_forms.address_change:
+  js:
+    js/address_change.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
+    - core/jquery
+
+localgov_forms_counter_aria:
+  js:
+    js/localgov_forms_counter_aria.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
+
+localgov_forms_two_decimal:
+  js:
+    js/localgov_forms_two_decimal.js: {}
+  dependencies:
+    - core/drupal
+    - core/once

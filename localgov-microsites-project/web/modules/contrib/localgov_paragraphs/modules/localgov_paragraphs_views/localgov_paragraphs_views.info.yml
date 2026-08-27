@@ -1,0 +1,13 @@
+type: module
+name: LocalGov Drupal Paragraphs Views
+description: Paragraphs referencing views
+package: LocalGov Drupal
+core_version_requirement: ^10 || ^11
+dependencies:
+  - viewsreference:viewsreference
+  - localgov_paragraphs:localgov_subsites_paragraphs
+
+# Information added by Drupal.org packaging script on 2026-06-09
+version: '2.6.5'
+project: 'localgov_paragraphs'
+datestamp: 1781005987

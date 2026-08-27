@@ -1,0 +1,18 @@
+{
+    "name": "drupal/localgov_blogs",
+    "description": "Provides blog channel and blog post content types with related views for LocalGov Drupal.",
+    "type": "drupal-module",
+    "homepage": "https://drupal.org/project/localgov_blogs",
+    "license": "GPL-2.0-or-later",
+    "minimum-stability": "dev",
+    "require": {
+        "drupal/field_group": "^4.0",
+        "drupal/search_api": "^1.17",
+        "drupal/localgov_core": "^2.14.14 || ^3.0",
+        "drupal/localgov_topics": "^1.0"
+    },
+    "require-dev": {
+        "drupal/entity_usage": "^2.0@beta",
+        "drupal/paragraphs": "^1.12"
+    }
+}

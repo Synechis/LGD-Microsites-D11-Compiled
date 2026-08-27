@@ -1,0 +1,67 @@
+<?php
+
+/**
+ * @file
+ * Enables Group functionality for the Node module.
+ */
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
+use Drupal\group\Entity\GroupInterface;
+use Drupal\node\NodeInterface;
+use Drupal\node\NodeTypeInterface;
+use Symfony\Component\Routing\RouterInterface;
+
+/**
+ * Implements hook_ENTITY_TYPE_insert().
+ */
+function gnode_node_type_insert(NodeTypeInterface $node_type) {
+  \Drupal::service('group_relation_type.manager')->clearCachedDefinitions();
+}
+
+/**
+ * Implements hook_entity_operation().
+ */
+function gnode_entity_operation(EntityInterface $entity) {
+  $operations = [];
+
+  if ($entity->getEntityTypeId() == 'group' && \Drupal::moduleHandler()->moduleExists('views')) {
+    assert($entity instanceof GroupInterface);
+    if ($entity->hasPermission('access group_node overview', \Drupal::currentUser())) {
+      $router = \Drupal::service('router.no_access_checks');
+      assert($router instanceof RouterInterface);
+      if ($router->getRouteCollection()->get('view.group_nodes.page_1') !== NULL) {
+        $operations['nodes'] = [
+          'title' => t('Nodes'),
+          'weight' => 20,
+          'url' => Url::fromRoute('view.group_nodes.page_1', ['group' => $entity->id()]),
+        ];
+      }
+    }
+  }
+
+  return $operations;
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter().
+ *
+ * Alter the URL for the backlink for \Drupal\node\Form\NodePreviewForm form.
+ */
+function gnode_form_node_preview_form_select_alter(&$form, FormStateInterface $form_state) {
+  $node_preview = $form_state->getBuildInfo()['args'][0] ?? NULL;
+  if (!$node_preview instanceof NodeInterface || !$node_preview->isNew()) {
+    return;
+  }
+
+  $store = \Drupal::service('tempstore.private')->get('node_preview');
+  $node_form_state = $store->get($node_preview->uuid());
+  $group = $node_form_state ? $node_form_state->get('group') : NULL;
+  if ($node_form_state && $group instanceof GroupInterface && ($plugin_id = $node_form_state->get('group_relation'))) {
+    $form['backlink']['#url'] = Url::fromRoute('entity.group_relationship.create_form', [
+      'group' => $group->id(),
+      'plugin_id' => $plugin_id,
+    ]);
+  }
+}

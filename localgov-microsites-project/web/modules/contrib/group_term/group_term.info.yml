@@ -1,0 +1,13 @@
+name: 'Group Term'
+description: 'Enables Group functionality for Taxonomy terms'
+package: 'Group'
+type: 'module'
+core_version_requirement: ^10.3 || ^11
+dependencies:
+  - 'drupal:taxonomy'
+  - 'group:group'
+
+# Information added by Drupal.org packaging script on 2025-04-02
+version: '4.1.3'
+project: 'group_term'
+datestamp: 1743632542

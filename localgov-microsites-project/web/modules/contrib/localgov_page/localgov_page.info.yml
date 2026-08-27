@@ -1,0 +1,26 @@
+name: LocalGov Page
+description: Page content type that allows the building of rich content using Paragraphs.
+package: LocalGov Drupal
+type: module
+core_version_requirement: ^10 || ^11
+
+dependencies:
+  - drupal:field
+  - drupal:image
+  - drupal:menu_ui
+  - drupal:node
+  - drupal:path
+  - drupal:text
+  - field_group:field_group
+  - layout_paragraphs:layout_paragraphs
+  - paragraphs:paragraphs
+  - localgov_core:localgov_media
+  - localgov_paragraphs:localgov_paragraphs
+  - localgov_paragraphs:localgov_paragraphs_layout
+  - localgov_paragraphs:localgov_paragraphs_views
+  - localgov_paragraphs:localgov_subsites_paragraphs
+
+# Information added by Drupal.org packaging script on 2026-05-21
+version: '1.2.2'
+project: 'localgov_page'
+datestamp: 1779366222

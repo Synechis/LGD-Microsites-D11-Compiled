@@ -1,0 +1,14 @@
+name: 'Localgov form date test'
+description: 'Helper module to setup a webform with a localgov_forms_date field.'
+type: module
+package: Testing
+core_version_requirement: ^10 || ^11
+
+dependencies:
+  - webform:webform
+  - localgov_forms:localgov_forms_date
+
+# Information added by Drupal.org packaging script on 2026-08-17
+version: '1.2.0'
+project: 'localgov_forms'
+datestamp: 1786967679

@@ -1,0 +1,28 @@
+# Ignore composer.lock as this is template project
+/composer.lock
+
+# Ignore sensitive information
+/web/sites/*/settings*.php
+/web/sites/*/services*.yml
+
+# Ignore Drupal's file directory
+/web/sites/*/files/
+
+# Ignore IDE files
+.idea/
+.vscode/
+
+# Ignore .env files as they are personal
+/.env
+
+# Ignore DB dumps
+*.sql
+*.sql.gz
+*.mysql
+*.mysql.gz
+
+# Ignore Lando overrides
+.lando.local.yml
+
+# Ignore temp files
+/.phpunit.result.cache

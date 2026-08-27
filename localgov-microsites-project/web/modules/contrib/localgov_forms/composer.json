@@ -1,0 +1,20 @@
+{
+  "name": "drupal/localgov_forms",
+  "description": "LocalGov Drupal distribution: Webform additions.",
+  "type": "drupal-module",
+  "homepage": "https://www.drupal.org/project/localgov_forms",
+  "license": "GPL-2.0-or-later",
+  "minimum-stability": "dev",
+  "require": {
+    "drupal/webform": "^6.2 || ^6.3@beta",
+    "drupal/geocoder": "^3.44 || ^4.21",
+    "localgovdrupal/localgov_os_places_geocoder_provider": "^1.0@beta"
+  },
+  "require-dev": {
+    "geocoder-php/nominatim-provider": "^5.2"
+  },
+  "suggest": {
+    "drupal/token_environment": "^1.1.0",
+    "drupal/config_ignore": "Ignore webform config and allow forms to be changed on production without risking them being deleted on a config sync (see README.md)."
+  }
+}

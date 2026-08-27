@@ -1,0 +1,12 @@
+{
+    "name": "drupal/localgov_microsites_base",
+    "description": "The base theme for LocalGov Drupal Microsites.",
+    "type": "drupal-theme",
+    "homepage": "https://www.drupal.org/project/localgov_microsites_base",
+    "license": "GPL-2.0-or-later",
+    "require": {
+        "drupal/twig_tweak": "^3.2",
+        "drupal/localgov_base": "^2.0.0",
+        "drupal/localgov_microsites_group": "^4.0.0-alpha3"
+    }
+}

@@ -1,0 +1,12 @@
+name: LocalGov Admin Role
+description: Creates an 'admin' role and assigns it all permissions.
+package: LocalGov Drupal
+type: module
+core_version_requirement: ^10 || ^11
+dependencies:
+  - localgov_core:localgov_roles
+
+# Information added by Drupal.org packaging script on 2026-07-07
+version: '3.3.0'
+project: 'localgov_core'
+datestamp: 1783422689

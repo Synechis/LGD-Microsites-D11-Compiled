@@ -1,0 +1,12 @@
+name: LocalGov Forms Demo Decision Tree
+type: module
+description: Demo of creating a decision tree with Drupal&#039;s webform module.
+package: LocalGov Drupal Examples
+core_version_requirement: ^10 || ^11
+dependencies:
+  - 'webform:webform'
+
+# Information added by Drupal.org packaging script on 2026-08-17
+version: '1.2.0'
+project: 'localgov_forms'
+datestamp: 1786967679

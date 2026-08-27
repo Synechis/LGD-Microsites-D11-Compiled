@@ -1,0 +1,25 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the LocalGov Live Preview module.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function localgov_live_preview_microsites_install(): void {
+  \Drupal::messenger()->addStatus('Localgov Live Preview Microsites module installed.');
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function localgov_live_preview_microsites_uninstall(): void {
+  \Drupal::messenger()->addStatus('Localgov Live Preview Microsites module uninstalled.');
+  // Remove the Live Preview form mode.
+  $form_mode = \Drupal::entityTypeManager()->getStorage('entity_form_mode')->load('group.localgov_live_preview');
+  if ($form_mode) {
+    $form_mode->delete();
+  }
+}

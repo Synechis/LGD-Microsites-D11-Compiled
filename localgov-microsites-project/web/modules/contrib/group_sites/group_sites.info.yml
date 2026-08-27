@@ -1,0 +1,13 @@
+name: 'Group Sites'
+description: 'Allows you to create microsites based on groups'
+package: 'Group'
+type: 'module'
+core_version_requirement: ^10.3 || ^11
+configure: 'group_sites.settings'
+dependencies:
+  - 'group:group'
+
+# Information added by Drupal.org packaging script on 2024-11-08
+version: '1.1.0'
+project: 'group_sites'
+datestamp: 1731068949

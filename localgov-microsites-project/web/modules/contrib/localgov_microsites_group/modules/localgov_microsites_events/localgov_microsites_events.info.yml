@@ -1,0 +1,21 @@
+name: Localgov Microsites Events
+description: LocalGov Events integration with Microsites.
+type: module
+package: LocalGov Drupal
+core_version_requirement: ^9 || ^10 || ^11
+dependencies:
+  - group:gnode
+  - group_term:group_term
+  - localgov_events:localgov_events
+  - localgov_microsites_group:localgov_microsites_group
+  - localgov_microsites_group:localgov_microsites_group_term_ui
+  - localgov_paragraphs:localgov_subsites_paragraphs
+  - localgov_paragraphs:localgov_paragraphs_layout
+  - localgov_paragraphs:localgov_paragraphs_views
+test_dependencies:
+  - localgov_page:localgov_page
+
+# Information added by Drupal.org packaging script on 2026-07-23
+version: '4.6.1'
+project: 'localgov_microsites_group'
+datestamp: 1784816709

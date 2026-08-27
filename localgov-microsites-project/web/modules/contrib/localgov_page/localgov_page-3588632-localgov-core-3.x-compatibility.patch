@@ -1,0 +1,13 @@
+diff --git a/composer.json b/composer.json
+index 3cc488f..d0a622d 100644
+--- a/composer.json
++++ b/composer.json
+@@ -6,7 +6,7 @@
+     "license": "GPL-2.0-or-later",
+     "minimum-stability": "dev",
+     "require": {
+-        "drupal/localgov_core": "^2.0",
++        "drupal/localgov_core": "^2.0 || ^3.0",
+         "drupal/localgov_paragraphs": "^2.0"
+     },
+     "extra": {

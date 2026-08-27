@@ -1,0 +1,140 @@
+<?php
+
+/**
+ * @file
+ * Update hooks.
+ */
+
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
+use Drupal\Core\Entity\Entity\EntityViewDisplay;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
+
+/**
+ * Implements hook_update_N().
+ */
+function localgov_subsites_paragraphs_update_10001(): void {
+  $paragraphType = 'localgov_accordion';
+  $display = 'paragraph.' . $paragraphType . '.default';
+  $existingFields = [
+    'localgov_heading_level' => ['weight' => 3],
+    'localgov_paragraphs' => ['weight' => 4],
+    'localgov_title' => ['weight' => 0],
+  ];
+  $newFields = [
+    'localgov_display_show_hide_all' => [
+      'field_storage' => [
+        'field_name' => 'localgov_display_show_hide_all',
+        'entity_type' => 'paragraph',
+        'type' => 'boolean',
+        'cardinality' => 1,
+      ],
+      'field_config' => [
+        'field_name' => 'localgov_display_show_hide_all',
+        'entity_type' => 'paragraph',
+        'bundle' => $paragraphType,
+        'label' => t('Display show/hide all toggle'),
+        'description' => t('When checked, the resulting accordion will include a button allowing all panes to be open or closed at once. Note that this automatically enables the option to open multiple panes at once.'),
+        'required' => FALSE,
+        'settings' => [
+          'display_label' => FALSE,
+          'on_label' => t('Yes'),
+          'off_label' => t('No'),
+        ],
+      ],
+      'weight' => 1,
+    ],
+    'localgov_allow_multiple_open' => [
+      'field_storage' => [
+        'field_name' => 'localgov_allow_multiple_open',
+        'entity_type' => 'paragraph',
+        'type' => 'boolean',
+        'cardinality' => 1,
+      ],
+      'field_config' => [
+        'field_name' => 'localgov_allow_multiple_open',
+        'entity_type' => 'paragraph',
+        'bundle' => $paragraphType,
+        'label' => t('Allow multiple open panes'),
+        'description' => t('When this is set to true, the resulting accordion will allow multiple panes to be open simultaneously.'),
+        'required' => FALSE,
+        'settings' => [
+          'display_label' => FALSE,
+          'on_label' => t('Yes'),
+          'off_label' => t('No'),
+        ],
+      ],
+      'weight' => 2,
+    ],
+  ];
+
+  $viewDisplay = EntityViewDisplay::load($display);
+  $formDisplay = EntityFormDisplay::load($display);
+
+  foreach (array_merge($existingFields, $newFields) as $fieldName => $config) {
+    if (array_key_exists($fieldName, $newFields)) {
+      if (!FieldStorageConfig::loadByName('paragraph', $fieldName)) {
+        // Field Storage.
+        $fieldStorage = FieldStorageConfig::create($config['field_storage']);
+        $fieldStorage->save();
+      }
+
+      if (!FieldConfig::loadByName('paragraph', 'localgov_accordion', $fieldName)) {
+        // Field Config.
+        $fieldConfig = FieldConfig::create($config['field_config']);
+        $fieldConfig->save();
+      }
+
+      // View Display.
+      if ($viewDisplay) {
+        $dependencies = $viewDisplay->getDependencies()['config'];
+        $dependency = 'field.field.paragraph.localgov_accordion.' . $fieldName;
+
+        if (!in_array($dependency, $dependencies, TRUE)) {
+          $dependencies[] = $dependency;
+          $viewDisplay->set('dependencies', ['config' => $dependencies]);
+          $viewDisplay->removeComponent($fieldName);
+          $viewDisplay->save();
+        }
+      }
+
+      // Form Display.
+      if ($formDisplay) {
+        $dependencies = $formDisplay->getDependencies()['config'];
+        $dependency = 'field.field.paragraph.localgov_accordion.' . $fieldName;
+
+        if (!in_array($dependency, $dependencies, TRUE)) {
+          $dependencies[] = $dependency;
+          $formDisplay->setComponent($fieldName, [
+            'type' => 'boolean_checkbox',
+            'region' => 'content',
+            'settings' => ['display_label' => TRUE],
+          ]);
+          $formDisplay->set('dependencies', ['config' => $dependencies]);
+          $formDisplay->save();
+        }
+      }
+    }
+
+    // Handle weights of new and existing fields.
+    if ($formDisplay) {
+      $component = $formDisplay->getComponent($fieldName);
+      $component['weight'] = $config['weight'];
+      $formDisplay->setComponent($fieldName, $component);
+      $formDisplay->save();
+    }
+  }
+}
+
+/**
+ * Update the description of the localgov_url field.
+ */
+function localgov_subsites_paragraphs_update_10002(): void {
+  // Update the description of the localgov_url field to match what we have
+  // in config.
+  $field = FieldConfig::loadByName('paragraph', 'localgov_banner_primary', 'localgov_url');
+  if ($field) {
+    $field->setDescription(t('An optional url. Adding a url here will make the banner title a link.'));
+    $field->save();
+  }
+}

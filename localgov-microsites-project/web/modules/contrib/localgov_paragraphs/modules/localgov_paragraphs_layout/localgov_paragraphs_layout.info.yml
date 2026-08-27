@@ -1,0 +1,13 @@
+type: module
+name: LocalGov Drupal layouts
+description: Layouts used in the LocalGov Drupal page
+package: LocalGov Drupal
+core_version_requirement: ^10 || ^11
+dependencies:
+  - drupal:menu_ui
+  - layout_paragraphs:layout_paragraphs
+
+# Information added by Drupal.org packaging script on 2026-06-09
+version: '2.6.5'
+project: 'localgov_paragraphs'
+datestamp: 1781005987

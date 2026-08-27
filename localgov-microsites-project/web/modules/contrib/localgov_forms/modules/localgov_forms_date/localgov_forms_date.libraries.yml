@@ -1,0 +1,4 @@
+localgov_forms_date:
+  css:
+    theme:
+      css/date.css: {}

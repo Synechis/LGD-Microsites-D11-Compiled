@@ -1,0 +1,15 @@
+name: LocalGov Roles
+description: Default user roles.
+package: LocalGov Drupal
+type: module
+core_version_requirement: ^10 || ^11
+
+dependencies:
+  - drupal:path
+  - drupal:toolbar
+  - role_delegation:role_delegation
+
+# Information added by Drupal.org packaging script on 2026-07-07
+version: '3.3.0'
+project: 'localgov_core'
+datestamp: 1783422689

@@ -1,0 +1,17 @@
+name: Test LocalGov Microsites localgovdrupal/localgov_microsites_colour_picker_fields drupal-module
+
+on:
+  push:
+    branches:
+      - '1.x'
+  pull_request:
+    branches:
+      - '1.x'
+  workflow_dispatch:
+
+jobs:
+  tests:
+    uses: localgovdrupal/localgov_shared_workflows/.github/workflows/test-microsites.yml@1.x
+    with:
+      project: 'localgovdrupal/localgov_microsites_colour_picker_fields'
+      project_path: 'web/modules/contrib/localgov_microsites_colour_picker_fields'

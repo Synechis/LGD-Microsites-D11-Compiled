@@ -1,0 +1,13 @@
+name: 'LocalGov Forms: Date'
+type: module
+description: 'A custom Date component'
+package: LocalGov Drupal
+core_version_requirement: ^10 || ^11
+dependencies:
+  - 'webform:webform'
+  - 'localgov_forms:localgov_forms'
+
+# Information added by Drupal.org packaging script on 2026-08-17
+version: '1.2.0'
+project: 'localgov_forms'
+datestamp: 1786967679

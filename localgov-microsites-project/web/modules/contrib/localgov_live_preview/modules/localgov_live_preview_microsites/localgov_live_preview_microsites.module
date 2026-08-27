@@ -1,0 +1,71 @@
+<?php
+
+/**
+ * @file
+ * Contains hooks and functionality for LocalGov Live Preview Microsites module.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
+
+/**
+ * @file
+ * Primary module hooks for LocalGov Live Preview module.
+ */
+
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function localgov_live_preview_microsites_preprocess_page(&$variables): void {
+  // Check if we are on a node page and are logged in.
+  $node = \Drupal::routeMatch()->getParameter('node');
+  if ($node && \Drupal::currentUser()->isAuthenticated()) {
+    // Add the live preview library.
+    $variables['#attached']['library'][] = 'localgov_live_preview_microsites/localgov-live-preview-microsites';
+  }
+}
+
+/**
+ * Implements hook_entity_form_mode_alter().
+ */
+function localgov_live_preview_microsites_entity_form_mode_alter(&$form_mode, EntityInterface $entity): void {
+  // Change the form mode for users with Administrator role.
+  if ($entity->getEntityTypeId() == 'group') {
+    $request = \Drupal::request();
+    // Check if the current request is for an Ajax modal/dialog (initial load).
+    $wrapper_format = $request->query->get(MainContentViewSubscriber::WRAPPER_FORMAT);
+    $is_off_canvas = in_array($wrapper_format, ['drupal_dialog.off_canvas'], TRUE);
+
+    // We want to alter the form mode on display and on submission of the form.
+    // This now sets the form mode both for the initial load of the form in the
+    // off-canvas modal and for subsequent AJAX submissions of the form,
+    // which do not have the off-canvas wrapper format but can be detected with
+    // our hidden form field localgov_live_preview_mode.
+    // @todo Refactor this to use a separate route for this form mode. This
+    // could be an alternative and clear approach.
+    $is_live_preview_post = (bool) $request->request->get('localgov_live_preview_mode');
+
+    if ($is_off_canvas || $is_live_preview_post) {
+      // We are inside a modal.
+      $form_mode = 'localgov_live_preview';
+    }
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function localgov_live_preview_microsites_form_group_microsite_edit_form_alter(&$form, FormStateInterface $form_state, $form_id): void {
+  $form_mode = $form_state->getStorage()['form_display']->getMode() ?? NULL;
+
+  if ($form_mode === 'localgov_live_preview') {
+    // Add a hidden marker so that hook_entity_form_mode_alter() can detect
+    // the live-preview context during AJAX form submissions, where
+    // _wrapper_format is 'drupal_ajax' rather than 'drupal_dialog.off_canvas'.
+    $form['localgov_live_preview_mode'] = [
+      '#type' => 'hidden',
+      '#value' => '1',
+    ];
+  }
+}

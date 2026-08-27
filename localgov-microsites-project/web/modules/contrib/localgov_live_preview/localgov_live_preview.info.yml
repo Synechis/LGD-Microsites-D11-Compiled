@@ -1,0 +1,10 @@
+name: LocalGov Live Preview
+type: module
+description: Opens editing interfaces in a modal, then provides a live preview when editing content.
+package: LocalGov Drupal (Experimental)
+core_version_requirement: ^10 || ^11
+
+# Information added by Drupal.org packaging script on 2026-05-14
+version: '1.1.0-beta4'
+project: 'localgov_live_preview'
+datestamp: 1778770727

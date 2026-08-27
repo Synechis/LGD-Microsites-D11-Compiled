@@ -1,0 +1,10 @@
+name: 'Page header display event test'
+type: module
+package: Testing
+core_version_requirement: ^10 || ^11
+description: Testing module for the page header display event.
+
+# Information added by Drupal.org packaging script on 2026-07-07
+version: '3.3.0'
+project: 'localgov_core'
+datestamp: 1783422689

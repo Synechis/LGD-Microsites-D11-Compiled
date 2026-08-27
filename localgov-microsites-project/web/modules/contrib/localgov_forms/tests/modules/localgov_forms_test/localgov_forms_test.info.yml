@@ -1,0 +1,15 @@
+name: 'Localgov form test'
+description: 'Helper module to setup a Contact webform.'
+type: module
+package: Testing
+core_version_requirement: ^10 || ^11
+
+dependencies:
+  - webform:webform
+  - geocoder:geocoder
+  - localgov_forms:localgov_forms
+
+# Information added by Drupal.org packaging script on 2026-08-17
+version: '1.2.0'
+project: 'localgov_forms'
+datestamp: 1786967679

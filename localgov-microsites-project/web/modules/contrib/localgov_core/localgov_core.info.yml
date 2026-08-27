@@ -1,0 +1,22 @@
+name: LocalGov Core
+description: LocalGov Drupal helper functions and core dependencies.
+package: LocalGov Drupal
+type: module
+core_version_requirement:  ^11.3
+
+dependencies:
+  - drupal:block
+  - drupal:field
+  - drupal:node
+  - drupal:views
+  - field_group:field_group
+
+test_dependencies:
+  - paragraphs:paragraphs
+  - paragraphs:paragraphs_library
+  - localgov_core:localgov_media_test_config
+
+# Information added by Drupal.org packaging script on 2026-07-07
+version: '3.3.0'
+project: 'localgov_core'
+datestamp: 1783422689

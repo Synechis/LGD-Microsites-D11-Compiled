@@ -1,0 +1,13 @@
+name: 'Group Media'
+description: 'Enables Group functionality for the Media module'
+package: 'Group'
+type: 'module'
+core_version_requirement: ^10.3 || ^11
+dependencies:
+  - drupal:media
+  - group:group
+
+# Information added by Drupal.org packaging script on 2026-04-27
+version: '4.0.7'
+project: 'groupmedia'
+datestamp: 1777327715

@@ -1,0 +1,16 @@
+name: LocalGov Forms
+type: module
+description: Provides additional configuration, styling and components for the Drupal Webform module.
+core_version_requirement: ^10 || ^11
+package: LocalGov Drupal
+
+dependencies:
+  - drupal:inline_form_errors
+  - drupal:geocoder
+  - webform:webform
+  - webform:webform_ui
+
+# Information added by Drupal.org packaging script on 2026-08-17
+version: '1.2.0'
+project: 'localgov_forms'
+datestamp: 1786967679

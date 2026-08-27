@@ -1,0 +1,19 @@
+name: Localgov Microsites Directories
+description: LocalGov Directories integration with Microsites.
+type: module
+package: LocalGov Drupal
+core_version_requirement: ^9 || ^10 || ^11
+dependencies:
+  - drupal:views
+  - localgov_directories:localgov_directories
+  - localgov_directories:localgov_directories_page
+  - localgov_directories:localgov_directories_promo_page
+  - localgov_directories:localgov_directories_venue
+  - localgov_microsites_group:localgov_microsites_group
+test_dependencies:
+  - localgov_page:localgov_page
+
+# Information added by Drupal.org packaging script on 2026-07-23
+version: '4.6.1'
+project: 'localgov_microsites_group'
+datestamp: 1784816709

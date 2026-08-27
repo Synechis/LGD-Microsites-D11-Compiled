@@ -1,0 +1,27 @@
+name: "LocalGov Claro"
+description: "Sub-theme of Claro for LGD sites."
+type: theme
+core_version_requirement: ^10 || ^11
+base theme: "claro"
+
+libraries-extend:
+  claro/node-form:
+    - localgov_claro/node-form
+
+regions:
+  header: 'Header'
+  pre_content: 'Pre-content'
+  breadcrumb: Breadcrumb
+  highlighted: Highlighted
+  help: Help
+  content: Content
+  page_top: 'Page top'
+  page_bottom: 'Page bottom'
+  sidebar_first: 'First sidebar'
+regions_hidden:
+  - sidebar_first
+
+# Information added by Drupal.org packaging script on 2025-12-09
+version: '2.2.0'
+project: 'localgov_claro'
+datestamp: 1765285132

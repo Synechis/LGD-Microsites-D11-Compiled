@@ -1,0 +1,10 @@
+# Custom module library for general purposes.
+localgov-live-preview-microsites:
+  js:
+    js/localgov-live-preview-microsites.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
+    - core/jquery
+    - core/drupal.dialog.ajax
+    - localgov_microsites_colour_picker_fields/localgov_microsites_colour_picker_fields
