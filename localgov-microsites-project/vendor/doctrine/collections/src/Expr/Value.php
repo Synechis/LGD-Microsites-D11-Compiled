@@ -4,21 +4,23 @@ declare(strict_types=1);
 
 namespace Doctrine\Common\Collections\Expr;
 
-use Override;
-
-final readonly class Value implements Expression
+/** @final since 2.5 */
+class Value implements Expression
 {
-    public function __construct(private mixed $value)
+    public function __construct(private readonly mixed $value)
     {
     }
 
-    public function getValue(): mixed
+    /** @return mixed */
+    public function getValue()
     {
         return $this->value;
     }
 
-    #[Override]
-    public function visit(ExpressionVisitor $visitor): mixed
+    /**
+     * {@inheritDoc}
+     */
+    public function visit(ExpressionVisitor $visitor)
     {
         return $visitor->walkValue($this);
     }

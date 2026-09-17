@@ -15,15 +15,19 @@ use Doctrine\Common\Collections\Expr\Value;
  * Important Notice for interoperable code: You have to use scalar
  * values only for comparisons, otherwise the behavior of the comparison
  * may be different between implementations (Array vs ORM vs ODM).
+ *
+ * @final since 2.5
  */
-final class ExpressionBuilder
+class ExpressionBuilder
 {
-    public function andX(Expression ...$expressions): CompositeExpression
+    /** @return CompositeExpression */
+    public function andX(Expression ...$expressions)
     {
         return new CompositeExpression(CompositeExpression::TYPE_AND, $expressions);
     }
 
-    public function orX(Expression ...$expressions): CompositeExpression
+    /** @return CompositeExpression */
+    public function orX(Expression ...$expressions)
     {
         return new CompositeExpression(CompositeExpression::TYPE_OR, $expressions);
     }
@@ -33,37 +37,44 @@ final class ExpressionBuilder
         return new CompositeExpression(CompositeExpression::TYPE_NOT, [$expression]);
     }
 
-    public function eq(string $field, mixed $value): Comparison
+    /** @return Comparison */
+    public function eq(string $field, mixed $value)
     {
         return new Comparison($field, Comparison::EQ, new Value($value));
     }
 
-    public function gt(string $field, mixed $value): Comparison
+    /** @return Comparison */
+    public function gt(string $field, mixed $value)
     {
         return new Comparison($field, Comparison::GT, new Value($value));
     }
 
-    public function lt(string $field, mixed $value): Comparison
+    /** @return Comparison */
+    public function lt(string $field, mixed $value)
     {
         return new Comparison($field, Comparison::LT, new Value($value));
     }
 
-    public function gte(string $field, mixed $value): Comparison
+    /** @return Comparison */
+    public function gte(string $field, mixed $value)
     {
         return new Comparison($field, Comparison::GTE, new Value($value));
     }
 
-    public function lte(string $field, mixed $value): Comparison
+    /** @return Comparison */
+    public function lte(string $field, mixed $value)
     {
         return new Comparison($field, Comparison::LTE, new Value($value));
     }
 
-    public function neq(string $field, mixed $value): Comparison
+    /** @return Comparison */
+    public function neq(string $field, mixed $value)
     {
         return new Comparison($field, Comparison::NEQ, new Value($value));
     }
 
-    public function isNull(string $field): Comparison
+    /** @return Comparison */
+    public function isNull(string $field)
     {
         return new Comparison($field, Comparison::EQ, new Value(null));
     }
@@ -73,34 +84,46 @@ final class ExpressionBuilder
         return new Comparison($field, Comparison::NEQ, new Value(null));
     }
 
-    /** @param mixed[] $values */
-    public function in(string $field, array $values): Comparison
+    /**
+     * @param mixed[] $values
+     *
+     * @return Comparison
+     */
+    public function in(string $field, array $values)
     {
         return new Comparison($field, Comparison::IN, new Value($values));
     }
 
-    /** @param mixed[] $values */
-    public function notIn(string $field, array $values): Comparison
+    /**
+     * @param mixed[] $values
+     *
+     * @return Comparison
+     */
+    public function notIn(string $field, array $values)
     {
         return new Comparison($field, Comparison::NIN, new Value($values));
     }
 
-    public function contains(string $field, mixed $value): Comparison
+    /** @return Comparison */
+    public function contains(string $field, mixed $value)
     {
         return new Comparison($field, Comparison::CONTAINS, new Value($value));
     }
 
-    public function memberOf(string $field, mixed $value): Comparison
+    /** @return Comparison */
+    public function memberOf(string $field, mixed $value)
     {
         return new Comparison($field, Comparison::MEMBER_OF, new Value($value));
     }
 
-    public function startsWith(string $field, mixed $value): Comparison
+    /** @return Comparison */
+    public function startsWith(string $field, mixed $value)
     {
         return new Comparison($field, Comparison::STARTS_WITH, new Value($value));
     }
 
-    public function endsWith(string $field, mixed $value): Comparison
+    /** @return Comparison */
+    public function endsWith(string $field, mixed $value)
     {
         return new Comparison($field, Comparison::ENDS_WITH, new Value($value));
     }

@@ -1,0 +1,16 @@
+name: 'Domain Path'
+description: 'Allows separate path aliases per domain.'
+type: module
+package: Domain
+core_version_requirement: ^9 || ^10 || ^11
+configure: entity.domain_path_settings
+dependencies:
+  - drupal:path
+  - domain:domain
+test_dependencies:
+  - domain:domain
+
+# Information added by Drupal.org packaging script on 2026-04-20
+version: '8.x-1.6'
+project: 'domain_path'
+datestamp: 1776702903

@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Doctrine\Common\Collections;
 
 use Closure;
+use Doctrine\Deprecations\Deprecation;
 use LogicException;
-use Override;
+use ReturnTypeWillChange;
 use Traversable;
 
 /**
@@ -22,221 +23,280 @@ abstract class AbstractLazyCollection implements Collection, Selectable
     /**
      * The backed collection to use
      *
-     * @var Collection<TKey,T>|null
+     * @phpstan-var Collection<TKey,T>|null
+     * @var Collection<mixed>|null
      */
     protected Collection|null $collection;
 
     protected bool $initialized = false;
 
-    #[Override]
-    public function count(): int
+    /**
+     * {@inheritDoc}
+     *
+     * @return int
+     */
+    #[ReturnTypeWillChange]
+    public function count()
     {
         $this->initialize();
 
         return $this->collection->count();
     }
 
-    #[Override]
-    public function add(mixed $element): void
+    /**
+     * {@inheritDoc}
+     */
+    public function add(mixed $element)
     {
         $this->initialize();
 
         $this->collection->add($element);
     }
 
-    #[Override]
-    public function clear(): void
+    /**
+     * {@inheritDoc}
+     */
+    public function clear()
     {
         $this->initialize();
         $this->collection->clear();
     }
 
-    #[Override]
-    public function contains(mixed $element): bool
+    /**
+     * {@inheritDoc}
+     */
+    public function contains(mixed $element)
     {
         $this->initialize();
 
         return $this->collection->contains($element);
     }
 
-    #[Override]
-    public function isEmpty(): bool
+    /**
+     * {@inheritDoc}
+     */
+    public function isEmpty()
     {
         $this->initialize();
 
         return $this->collection->isEmpty();
     }
 
-    #[Override]
-    public function remove(string|int $key): mixed
+    /**
+     * {@inheritDoc}
+     */
+    public function remove(string|int $key)
     {
         $this->initialize();
 
         return $this->collection->remove($key);
     }
 
-    #[Override]
-    public function removeElement(mixed $element): bool
+    /**
+     * {@inheritDoc}
+     */
+    public function removeElement(mixed $element)
     {
         $this->initialize();
 
         return $this->collection->removeElement($element);
     }
 
-    #[Override]
-    public function containsKey(string|int $key): bool
+    /**
+     * {@inheritDoc}
+     */
+    public function containsKey(string|int $key)
     {
         $this->initialize();
 
         return $this->collection->containsKey($key);
     }
 
-    #[Override]
-    public function get(string|int $key): mixed
+    /**
+     * {@inheritDoc}
+     */
+    public function get(string|int $key)
     {
         $this->initialize();
 
         return $this->collection->get($key);
     }
 
-    #[Override]
-    public function getKeys(): array
+    /**
+     * {@inheritDoc}
+     */
+    public function getKeys()
     {
         $this->initialize();
 
         return $this->collection->getKeys();
     }
 
-    #[Override]
-    public function getValues(): array
+    /**
+     * {@inheritDoc}
+     */
+    public function getValues()
     {
         $this->initialize();
 
         return $this->collection->getValues();
     }
 
-    #[Override]
-    public function set(string|int $key, mixed $value): void
+    /**
+     * {@inheritDoc}
+     */
+    public function set(string|int $key, mixed $value)
     {
         $this->initialize();
         $this->collection->set($key, $value);
     }
 
-    #[Override]
-    public function toArray(): array
+    /**
+     * {@inheritDoc}
+     */
+    public function toArray()
     {
         $this->initialize();
 
         return $this->collection->toArray();
     }
 
-    #[Override]
-    public function first(): mixed
+    /**
+     * {@inheritDoc}
+     */
+    public function first()
     {
         $this->initialize();
 
         return $this->collection->first();
     }
 
-    #[Override]
-    public function last(): mixed
+    /**
+     * {@inheritDoc}
+     */
+    public function last()
     {
         $this->initialize();
 
         return $this->collection->last();
     }
 
-    #[Override]
-    public function key(): string|int|null
+    /**
+     * {@inheritDoc}
+     */
+    public function key()
     {
         $this->initialize();
 
         return $this->collection->key();
     }
 
-    #[Override]
-    public function current(): mixed
+    /**
+     * {@inheritDoc}
+     */
+    public function current()
     {
         $this->initialize();
 
         return $this->collection->current();
     }
 
-    #[Override]
-    public function next(): mixed
+    /**
+     * {@inheritDoc}
+     */
+    public function next()
     {
         $this->initialize();
 
         return $this->collection->next();
     }
 
-    #[Override]
-    public function exists(Closure $p): bool
+    /**
+     * {@inheritDoc}
+     */
+    public function exists(Closure $p)
     {
         $this->initialize();
 
         return $this->collection->exists($p);
     }
 
-    #[Override]
-    public function findFirst(Closure $p): mixed
+    /**
+     * {@inheritDoc}
+     */
+    public function findFirst(Closure $p)
     {
         $this->initialize();
 
         return $this->collection->findFirst($p);
     }
 
-    #[Override]
-    public function filter(Closure $p): Collection
+    /**
+     * {@inheritDoc}
+     */
+    public function filter(Closure $p)
     {
         $this->initialize();
 
         return $this->collection->filter($p);
     }
 
-    #[Override]
-    public function forAll(Closure $p): bool
+    /**
+     * {@inheritDoc}
+     */
+    public function forAll(Closure $p)
     {
         $this->initialize();
 
         return $this->collection->forAll($p);
     }
 
-    #[Override]
-    public function map(Closure $func): Collection
+    /**
+     * {@inheritDoc}
+     */
+    public function map(Closure $func)
     {
         $this->initialize();
 
         return $this->collection->map($func);
     }
 
-    #[Override]
-    public function reduce(Closure $func, mixed $initial = null): mixed
+    /**
+     * {@inheritDoc}
+     */
+    public function reduce(Closure $func, mixed $initial = null)
     {
         $this->initialize();
 
         return $this->collection->reduce($func, $initial);
     }
 
-    #[Override]
-    public function partition(Closure $p): array
+    /**
+     * {@inheritDoc}
+     */
+    public function partition(Closure $p)
     {
         $this->initialize();
 
         return $this->collection->partition($p);
     }
 
-    /** @template TMaybeContained */
-    #[Override]
-    public function indexOf(mixed $element): string|int|false
+    /**
+     * {@inheritDoc}
+     *
+     * @template TMaybeContained
+     */
+    public function indexOf(mixed $element)
     {
         $this->initialize();
 
         return $this->collection->indexOf($element);
     }
 
-    #[Override]
-    public function slice(int $offset, int|null $length = null): array
+    /**
+     * {@inheritDoc}
+     */
+    public function slice(int $offset, int|null $length = null)
     {
         $this->initialize();
 
@@ -244,29 +304,43 @@ abstract class AbstractLazyCollection implements Collection, Selectable
     }
 
     /**
+     * {@inheritDoc}
+     *
      * @return Traversable<int|string, mixed>
      * @phpstan-return Traversable<TKey,T>
      */
-    #[Override]
-    public function getIterator(): Traversable
+    #[ReturnTypeWillChange]
+    public function getIterator()
     {
         $this->initialize();
 
         return $this->collection->getIterator();
     }
 
-    /** @param TKey $offset */
-    #[Override]
-    public function offsetExists(mixed $offset): bool
+    /**
+     * {@inheritDoc}
+     *
+     * @param TKey $offset
+     *
+     * @return bool
+     */
+    #[ReturnTypeWillChange]
+    public function offsetExists(mixed $offset)
     {
         $this->initialize();
 
         return $this->collection->offsetExists($offset);
     }
 
-    /** @param TKey $offset */
-    #[Override]
-    public function offsetGet(mixed $offset): mixed
+    /**
+     * {@inheritDoc}
+     *
+     * @param TKey $offset
+     *
+     * @return T|null
+     */
+    #[ReturnTypeWillChange]
+    public function offsetGet(mixed $offset)
     {
         $this->initialize();
 
@@ -274,19 +348,27 @@ abstract class AbstractLazyCollection implements Collection, Selectable
     }
 
     /**
+     * {@inheritDoc}
+     *
      * @param TKey|null $offset
      * @param T         $value
+     *
+     * @return void
      */
-    #[Override]
-    public function offsetSet(mixed $offset, mixed $value): void
+    #[ReturnTypeWillChange]
+    public function offsetSet(mixed $offset, mixed $value)
     {
         $this->initialize();
         $this->collection->offsetSet($offset, $value);
     }
 
-    /** @param TKey $offset */
-    #[Override]
-    public function offsetUnset(mixed $offset): void
+    /**
+     * @param TKey $offset
+     *
+     * @return void
+     */
+    #[ReturnTypeWillChange]
+    public function offsetUnset(mixed $offset)
     {
         $this->initialize();
         $this->collection->offsetUnset($offset);
@@ -295,9 +377,11 @@ abstract class AbstractLazyCollection implements Collection, Selectable
     /**
      * Is the lazy collection already initialized?
      *
+     * @return bool
+     *
      * @phpstan-assert-if-true Collection<TKey,T> $this->collection
      */
-    public function isInitialized(): bool
+    public function isInitialized()
     {
         return $this->initialized;
     }
@@ -305,9 +389,11 @@ abstract class AbstractLazyCollection implements Collection, Selectable
     /**
      * Initialize the collection
      *
+     * @return void
+     *
      * @phpstan-assert Collection<TKey,T> $this->collection
      */
-    protected function initialize(): void
+    protected function initialize()
     {
         if ($this->initialized) {
             return;
@@ -319,17 +405,37 @@ abstract class AbstractLazyCollection implements Collection, Selectable
         if ($this->collection === null) {
             throw new LogicException('You must initialize the collection property in the doInitialize() method.');
         }
+
+        if ($this->collection instanceof Selectable) {
+            return;
+        }
+
+        Deprecation::trigger(
+            'doctrine/collections',
+            'https://github.com/doctrine/collections/pull/518',
+            'Initializing %s with a collection that does not implement %s is deprecated and will throw an exception in 3.0.',
+            self::class,
+            Selectable::class,
+        );
     }
 
     /**
      * Do the initialization logic
+     *
+     * @return void
      */
-    abstract protected function doInitialize(): void;
+    abstract protected function doInitialize();
 
-    #[Override]
-    public function matching(Criteria $criteria): ReadableCollection
+    /**
+     * {@inheritDoc}
+     */
+    public function matching(Criteria $criteria)
     {
         $this->initialize();
+
+        if (! $this->collection instanceof Selectable) {
+            throw new LogicException('The backed collection must implement Selectable to use matching().');
+        }
 
         return $this->collection->matching($criteria);
     }

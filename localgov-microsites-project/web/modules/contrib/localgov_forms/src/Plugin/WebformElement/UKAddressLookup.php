@@ -79,6 +79,16 @@ class UKAddressLookup extends WebformCompositeBase {
   }
 
   /**
+   * Strips transient sub-fields from one address element's submission data.
+   */
+  protected function stripTransientFields(string $key, array &$submission_data): void {
+    unset($submission_data[$key]['address_lookup']);
+    foreach (['lat', 'lng', 'ward'] as $extra) {
+      unset($submission_data[$key][$extra]);
+    }
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function preSave(array &$element, WebformSubmissionInterface $webform_submission): void {
@@ -86,12 +96,8 @@ class UKAddressLookup extends WebformCompositeBase {
     $webform = $webform_submission->getWebform();
     foreach ($submission_data as $key => $value) {
       $webform_element = $webform->getElement($key);
-      if ($webform_element['#type'] == 'localgov_webform_uk_address') {
-        unset($submission_data[$key]['address_lookup']);
-        $extra_elements = ['lat', 'lng', 'ward'];
-        foreach ($extra_elements as $extra_element) {
-          unset($submission_data[$extra_element]);
-        }
+      if (($webform_element['#type'] ?? '') === 'localgov_webform_uk_address') {
+        $this->stripTransientFields($key, $submission_data);
       }
     }
     $webform_submission->setData($submission_data);

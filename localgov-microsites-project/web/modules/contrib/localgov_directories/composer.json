@@ -36,7 +36,7 @@
                 "Don't render facet block if backend isn't available: https://www.drupal.org/project/facets/issues/3311856": "https://git.drupalcode.org/issue/facets-3311856/-/commit/765d5ef4228906c7f201e116763f3018a7867c96.patch"
             },
             "drupal/preview_link": {
-                "Automatically populating multiple preview link entities #3439968": "https://www.drupal.org/files/issues/2024-05-22/3439968-4.diff"
+                "Automatically populating multiple preview link entities #3439968": "https://www.drupal.org/files/issues/2026-09-04/3439968-9.patch"
             }
         }
     }

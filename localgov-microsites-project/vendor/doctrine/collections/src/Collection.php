@@ -6,7 +6,6 @@ namespace Doctrine\Common\Collections;
 
 use ArrayAccess;
 use Closure;
-use Override;
 
 /**
  * The missing (SPL) Collection/Array/OrderedMap interface.
@@ -37,13 +36,17 @@ interface Collection extends ReadableCollection, ArrayAccess
      *
      * @param mixed $element The element to add.
      * @phpstan-param T $element
+     *
+     * @return void we will require a native return type declaration in 3.0
      */
-    public function add(mixed $element): void;
+    public function add(mixed $element);
 
     /**
      * Clears the collection, removing all elements.
+     *
+     * @return void
      */
-    public function clear(): void;
+    public function clear();
 
     /**
      * Removes the element at the specified index from the collection.
@@ -54,7 +57,7 @@ interface Collection extends ReadableCollection, ArrayAccess
      * @return mixed The removed element or NULL, if the collection did not contain the element.
      * @phpstan-return T|null
      */
-    public function remove(string|int $key): mixed;
+    public function remove(string|int $key);
 
     /**
      * Removes the specified element from the collection, if it is found.
@@ -64,7 +67,7 @@ interface Collection extends ReadableCollection, ArrayAccess
      *
      * @return bool TRUE if this collection contained the specified element, FALSE otherwise.
      */
-    public function removeElement(mixed $element): bool;
+    public function removeElement(mixed $element);
 
     /**
      * Sets an element in the collection at the specified key/index.
@@ -73,10 +76,14 @@ interface Collection extends ReadableCollection, ArrayAccess
      * @param mixed      $value The element to set.
      * @phpstan-param TKey $key
      * @phpstan-param T $value
+     *
+     * @return void
      */
-    public function set(string|int $key, mixed $value): void;
+    public function set(string|int $key, mixed $value);
 
     /**
+     * {@inheritDoc}
+     *
      * @phpstan-param Closure(T):U $func
      *
      * @return Collection<mixed>
@@ -84,19 +91,21 @@ interface Collection extends ReadableCollection, ArrayAccess
      *
      * @phpstan-template U
      */
-    #[Override]
-    public function map(Closure $func): self;
+    public function map(Closure $func);
 
     /**
+     * {@inheritDoc}
+     *
      * @phpstan-param Closure(T, TKey):bool $p
      *
      * @return Collection<mixed> A collection with the results of the filter operation.
      * @phpstan-return Collection<TKey, T>
      */
-    #[Override]
-    public function filter(Closure $p): self;
+    public function filter(Closure $p);
 
     /**
+     * {@inheritDoc}
+     *
      * @phpstan-param Closure(TKey, T):bool $p
      *
      * @return Collection<mixed>[] An array with two elements. The first element contains the collection
@@ -104,6 +113,5 @@ interface Collection extends ReadableCollection, ArrayAccess
      *                      contains the collection of elements where the predicate returned FALSE.
      * @phpstan-return array{0: Collection<TKey, T>, 1: Collection<TKey, T>}
      */
-    #[Override]
-    public function partition(Closure $p): array;
+    public function partition(Closure $p);
 }

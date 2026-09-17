@@ -4,24 +4,32 @@ declare(strict_types=1);
 
 namespace Doctrine\Common\Collections;
 
-use Deprecated;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Doctrine\Common\Collections\Expr\Expression;
 use Doctrine\Deprecations\Deprecation;
-use SortDirection;
 
+use function array_map;
+use function func_get_arg;
 use function func_num_args;
+use function strtoupper;
 
 /**
  * Criteria for filtering Selectable collections.
  *
  * @phpstan-consistent-constructor
+ * @final since 2.5
  */
-final class Criteria
+class Criteria
 {
+    /** @deprecated use Order::Ascending instead */
+    final public const ASC = 'ASC';
+
+    /** @deprecated use Order::Descending instead */
+    final public const DESC = 'DESC';
+
     private static ExpressionBuilder|null $expressionBuilder = null;
 
-    /** @var array<string, Order|SortDirection> */
+    /** @var array<string, Order> */
     private array $orderings = [];
 
     private int|null $firstResult = null;
@@ -29,25 +37,22 @@ final class Criteria
 
     /**
      * Creates an instance of the class.
+     *
+     * @return static
      */
-    public static function create(): static
+    public static function create(/* bool $accessRawFieldValues = false */): self
     {
-        if (func_num_args() === 1) {
-            Deprecation::trigger(
-                'doctrine/collections',
-                'https://github.com/doctrine/collections/pull/486',
-                'The `accessRawFieldValues` parameter passed to %s is deprecated and a no-op. You can remove it.',
-                __METHOD__,
-            );
-        }
+        $accessRawFieldValues = 0 < func_num_args() ? func_get_arg(0) : false;
 
-        return new static();
+        return new static(firstResult: 0, accessRawFieldValues: $accessRawFieldValues);
     }
 
     /**
      * Returns the expression builder.
+     *
+     * @return ExpressionBuilder
      */
-    public static function expr(): ExpressionBuilder
+    public static function expr()
     {
         if (self::$expressionBuilder === null) {
             self::$expressionBuilder = new ExpressionBuilder();
@@ -59,21 +64,36 @@ final class Criteria
     /**
      * Construct a new Criteria.
      *
-     * @param array<string, Order|SortDirection>|null $orderings
+     * @param int|null                         $firstResult
+     * @param array<string, string|Order>|null $orderings
      */
     public function __construct(
         private Expression|null $expression = null,
         array|null $orderings = null,
-        int $firstResult = 0,
+        int|Placeholder|null $firstResult = Placeholder::NotSpecified,
         int|null $maxResults = null,
+        private bool $accessRawFieldValues = false,
     ) {
-        if (func_num_args() === 5) {
+        if (! $accessRawFieldValues) {
             Deprecation::trigger(
                 'doctrine/collections',
-                'https://github.com/doctrine/collections/pull/486',
-                'The `accessRawFieldValues` parameter passed to %s is deprecated and a no-op. You can remove it.',
-                __METHOD__,
+                'https://github.com/doctrine/collections/pull/472',
+                'Not enabling raw field value access for the Criteria matching API in %s is deprecated. Raw field access will be the only supported method in 3.0',
+                self::class,
             );
+        }
+
+        if ($firstResult === null) {
+            Deprecation::trigger(
+                'doctrine/collections',
+                'https://github.com/doctrine/collections/pull/311',
+                'Passing null as $firstResult to the constructor of %s is deprecated. Pass 0 instead or omit the argument.',
+                self::class,
+            );
+        }
+
+        if ($firstResult === Placeholder::NotSpecified) {
+            $firstResult = null;
         }
 
         $this->setFirstResult($firstResult);
@@ -91,7 +111,7 @@ final class Criteria
      *
      * @return $this
      */
-    public function where(Expression $expression): static
+    public function where(Expression $expression)
     {
         $this->expression = $expression;
 
@@ -104,7 +124,7 @@ final class Criteria
      *
      * @return $this
      */
-    public function andWhere(Expression $expression): static
+    public function andWhere(Expression $expression)
     {
         if ($this->expression === null) {
             return $this->where($expression);
@@ -124,7 +144,7 @@ final class Criteria
      *
      * @return $this
      */
-    public function orWhere(Expression $expression): static
+    public function orWhere(Expression $expression)
     {
         if ($this->expression === null) {
             return $this->where($expression);
@@ -140,8 +160,10 @@ final class Criteria
 
     /**
      * Gets the expression attached to this Criteria.
+     *
+     * @return Expression|null
      */
-    public function getWhereExpression(): Expression|null
+    public function getWhereExpression()
     {
         return $this->expression;
     }
@@ -149,16 +171,22 @@ final class Criteria
     /**
      * Gets the current orderings of this Criteria.
      *
-     * @return array<string, SortDirection>
+     * @deprecated use orderings() instead
+     *
+     * @return array<string, string>
      */
-    public function getOrderings(): array
+    public function getOrderings()
     {
+        Deprecation::trigger(
+            'doctrine/collections',
+            'https://github.com/doctrine/collections/pull/389',
+            'Calling %s() is deprecated. Use %s::orderings() instead.',
+            __METHOD__,
+            self::class,
+        );
+
         return array_map(
-            static fn (Order|SortDirection $order): SortDirection => $order instanceof Order
-                ? $order == Order::Ascending
-                    ? SortDirection::Ascending
-                    : SortDirection::Descending
-                : $order,
+            static fn (Order $ordering): string => $ordering->value,
             $this->orderings,
         );
     }
@@ -168,42 +196,59 @@ final class Criteria
      *
      * @return array<string, Order>
      */
-    #[Deprecated(message: 'Use getOrderings() instead.', since: 'doctrine/collections 3.1')]
     public function orderings(): array
     {
-        return array_map(
-            static fn (Order|SortDirection $order): Order => $order instanceof SortDirection
-                ? $order == SortDirection::Ascending
-                    ? Order::Ascending
-                    : Order::Descending
-                : $order,
-            $this->orderings,
-        );
+        return $this->orderings;
     }
 
     /**
      * Sets the ordering of the result of this Criteria.
      *
-     * Keys are field and values are the order, being a valid SortDirection enum case.
+     * Keys are field and values are the order, being a valid Order enum case.
      *
-     * @see SortDirection::Ascending
-     * @see SortDirection::Descending
+     * @see Order::Ascending
+     * @see Order::Descending
      *
-     * @param array<string, Order|SortDirection> $orderings
+     * @param array<string, string|Order> $orderings
      *
      * @return $this
      */
-    public function orderBy(array $orderings): static
+    public function orderBy(array $orderings)
     {
-        $this->orderings = $orderings;
+        $method          = __METHOD__;
+        $this->orderings = array_map(
+            static function (string|Order $ordering) use ($method): Order {
+                if ($ordering instanceof Order) {
+                    return $ordering;
+                }
+
+                static $triggered = false;
+
+                if (! $triggered) {
+                    Deprecation::trigger(
+                        'doctrine/collections',
+                        'https://github.com/doctrine/collections/pull/389',
+                        'Passing non-Order enum values to %s() is deprecated. Pass Order enum values instead.',
+                        $method,
+                    );
+                }
+
+                $triggered = true;
+
+                return strtoupper($ordering) === Order::Ascending->value ? Order::Ascending : Order::Descending;
+            },
+            $orderings,
+        );
 
         return $this;
     }
 
     /**
      * Gets the current first result option of this Criteria.
+     *
+     * @return int|null
      */
-    public function getFirstResult(): int|null
+    public function getFirstResult()
     {
         return $this->firstResult;
     }
@@ -211,12 +256,21 @@ final class Criteria
     /**
      * Set the number of first result that this Criteria should return.
      *
-     * @param int $firstResult The value to set.
+     * @param int|null $firstResult The value to set.
      *
      * @return $this
      */
-    public function setFirstResult(int $firstResult): static
+    public function setFirstResult(int|null $firstResult)
     {
+        if ($firstResult === null) {
+            Deprecation::triggerIfCalledFromOutside(
+                'doctrine/collections',
+                'https://github.com/doctrine/collections/pull/311',
+                'Passing null to %s() is deprecated, pass 0 instead.',
+                __METHOD__,
+            );
+        }
+
         $this->firstResult = $firstResult;
 
         return $this;
@@ -224,8 +278,10 @@ final class Criteria
 
     /**
      * Gets maxResults.
+     *
+     * @return int|null
      */
-    public function getMaxResults(): int|null
+    public function getMaxResults()
     {
         return $this->maxResults;
     }
@@ -237,10 +293,16 @@ final class Criteria
      *
      * @return $this
      */
-    public function setMaxResults(int|null $maxResults): static
+    public function setMaxResults(int|null $maxResults)
     {
         $this->maxResults = $maxResults;
 
         return $this;
+    }
+
+    /** @internal */
+    public function isRawFieldValueAccessEnabled(): bool
+    {
+        return $this->accessRawFieldValues;
     }
 }

@@ -37,6 +37,16 @@ localgov_forms_counter_aria:
     - core/drupal
     - core/once
 
+localgov_forms_international_address_lookup:
+  js:
+    js/localgov_forms_international_address_lookup.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/drupalSettings
+    - core/once
+    - localgov_forms/localgov_forms.address_select
+
 localgov_forms_two_decimal:
   js:
     js/localgov_forms_two_decimal.js: {}

@@ -11,7 +11,7 @@ dependencies:
   - search_api_location:search_api_location_views
   - search_api_location:search_api_location_geocoder
 
-# Information added by Drupal.org packaging script on 2026-07-28
-version: '3.5.3'
+# Information added by Drupal.org packaging script on 2026-09-07
+version: '3.5.4'
 project: 'localgov_directories'
-datestamp: 1785237376
+datestamp: 1788779385

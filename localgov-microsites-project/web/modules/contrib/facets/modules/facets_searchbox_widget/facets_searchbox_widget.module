@@ -5,6 +5,7 @@
  * Contains install hooks for facets searchbox widget.
  */
 
+use Drupal\Component\Utility\DeprecationHelper;
 use Drupal\Core\Theme\ThemePreprocess;
 
 /**
@@ -59,7 +60,16 @@ function facets_searchbox_widget_theme($existing, $type, $theme, $path) {
  * @see https://www.drupal.org/node/1842756
  */
 function facets_searchbox_widget_preprocess_facets_item_list__searchbox_checkbox(array &$variables) {
-  \Drupal::service(ThemePreprocess::class)->preprocessItemList($variables);
+  DeprecationHelper::backwardsCompatibleCall(
+    \Drupal::VERSION,
+    '11.3.0',
+    function () use (&$variables): void {
+      \Drupal::service(ThemePreprocess::class)->preprocessItemList($variables);
+    },
+    function () use (&$variables): void {
+      template_preprocess_item_list($variables);
+    },
+  );
 }
 
 /**
@@ -82,5 +92,14 @@ function facets_searchbox_widget_preprocess_facets_item_list__searchbox_checkbox
  * @see https://www.drupal.org/node/1842756
  */
 function facets_searchbox_widget_preprocess_facets_item_list__searchbox_links(array &$variables) {
-  \Drupal::service(ThemePreprocess::class)->preprocessItemList($variables);
+  DeprecationHelper::backwardsCompatibleCall(
+    \Drupal::VERSION,
+    '11.3.0',
+    function () use (&$variables): void {
+      \Drupal::service(ThemePreprocess::class)->preprocessItemList($variables);
+    },
+    function () use (&$variables): void {
+      template_preprocess_item_list($variables);
+    },
+  );
 }

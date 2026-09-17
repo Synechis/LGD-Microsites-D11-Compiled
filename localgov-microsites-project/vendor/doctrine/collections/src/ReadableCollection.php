@@ -12,9 +12,8 @@ use IteratorAggregate;
  * @phpstan-template TKey of array-key
  * @template-covariant T
  * @template-extends IteratorAggregate<TKey, T>
- * @template-extends Selectable<TKey, T>
  */
-interface ReadableCollection extends Countable, IteratorAggregate, Selectable
+interface ReadableCollection extends Countable, IteratorAggregate
 {
     /**
      * Checks whether an element is contained in the collection.
@@ -28,14 +27,14 @@ interface ReadableCollection extends Countable, IteratorAggregate, Selectable
      *
      * @template TMaybeContained
      */
-    public function contains(mixed $element): bool;
+    public function contains(mixed $element);
 
     /**
      * Checks whether the collection is empty (contains no elements).
      *
      * @return bool TRUE if the collection is empty, FALSE otherwise.
      */
-    public function isEmpty(): bool;
+    public function isEmpty();
 
     /**
      * Checks whether the collection contains an element with the specified key/index.
@@ -46,7 +45,7 @@ interface ReadableCollection extends Countable, IteratorAggregate, Selectable
      * @return bool TRUE if the collection contains an element with the specified key/index,
      *              FALSE otherwise.
      */
-    public function containsKey(string|int $key): bool;
+    public function containsKey(string|int $key);
 
     /**
      * Gets the element at the specified key/index.
@@ -54,9 +53,10 @@ interface ReadableCollection extends Countable, IteratorAggregate, Selectable
      * @param string|int $key The key/index of the element to retrieve.
      * @phpstan-param TKey $key
      *
+     * @return mixed
      * @phpstan-return T|null
      */
-    public function get(string|int $key): mixed;
+    public function get(string|int $key);
 
     /**
      * Gets all keys/indices of the collection.
@@ -65,7 +65,7 @@ interface ReadableCollection extends Countable, IteratorAggregate, Selectable
      *               elements in the collection.
      * @phpstan-return list<TKey>
      */
-    public function getKeys(): array;
+    public function getKeys();
 
     /**
      * Gets all values of the collection.
@@ -74,7 +74,7 @@ interface ReadableCollection extends Countable, IteratorAggregate, Selectable
      *                 order they appear in the collection.
      * @phpstan-return list<T>
      */
-    public function getValues(): array;
+    public function getValues();
 
     /**
      * Gets a native PHP array representation of the collection.
@@ -82,42 +82,47 @@ interface ReadableCollection extends Countable, IteratorAggregate, Selectable
      * @return mixed[]
      * @phpstan-return array<TKey,T>
      */
-    public function toArray(): array;
+    public function toArray();
 
     /**
      * Sets the internal iterator to the first element in the collection and returns this element.
      *
+     * @return mixed
      * @phpstan-return T|false
      */
-    public function first(): mixed;
+    public function first();
 
     /**
      * Sets the internal iterator to the last element in the collection and returns this element.
      *
+     * @return mixed
      * @phpstan-return T|false
      */
-    public function last(): mixed;
+    public function last();
 
     /**
      * Gets the key/index of the element at the current iterator position.
      *
+     * @return int|string|null
      * @phpstan-return TKey|null
      */
-    public function key(): int|string|null;
+    public function key();
 
     /**
      * Gets the element of the collection at the current iterator position.
      *
+     * @return mixed
      * @phpstan-return T|false
      */
-    public function current(): mixed;
+    public function current();
 
     /**
      * Moves the internal iterator position to the next element and returns this element.
      *
+     * @return mixed
      * @phpstan-return T|false
      */
-    public function next(): mixed;
+    public function next();
 
     /**
      * Extracts a slice of $length elements starting at position $offset from the Collection.
@@ -132,7 +137,7 @@ interface ReadableCollection extends Countable, IteratorAggregate, Selectable
      * @return mixed[]
      * @phpstan-return array<TKey,T>
      */
-    public function slice(int $offset, int|null $length = null): array;
+    public function slice(int $offset, int|null $length = null);
 
     /**
      * Tests for the existence of an element that satisfies the given predicate.
@@ -142,7 +147,7 @@ interface ReadableCollection extends Countable, IteratorAggregate, Selectable
      *
      * @return bool TRUE if the predicate is TRUE for at least one element, FALSE otherwise.
      */
-    public function exists(Closure $p): bool;
+    public function exists(Closure $p);
 
     /**
      * Returns all the elements of this collection that satisfy the predicate p.
@@ -154,7 +159,7 @@ interface ReadableCollection extends Countable, IteratorAggregate, Selectable
      * @return ReadableCollection<mixed> A collection with the results of the filter operation.
      * @phpstan-return ReadableCollection<TKey, T>
      */
-    public function filter(Closure $p): self;
+    public function filter(Closure $p);
 
     /**
      * Applies the given function to each element in the collection and returns
@@ -167,7 +172,7 @@ interface ReadableCollection extends Countable, IteratorAggregate, Selectable
      *
      * @phpstan-template U
      */
-    public function map(Closure $func): self;
+    public function map(Closure $func);
 
     /**
      * Partitions this collection in two collections according to a predicate.
@@ -181,7 +186,7 @@ interface ReadableCollection extends Countable, IteratorAggregate, Selectable
      *                      contains the collection of elements where the predicate returned FALSE.
      * @phpstan-return array{0: ReadableCollection<TKey, T>, 1: ReadableCollection<TKey, T>}
      */
-    public function partition(Closure $p): array;
+    public function partition(Closure $p);
 
     /**
      * Tests whether the given predicate p holds for all elements of this collection.
@@ -191,7 +196,7 @@ interface ReadableCollection extends Countable, IteratorAggregate, Selectable
      *
      * @return bool TRUE, if the predicate yields TRUE for all elements, FALSE otherwise.
      */
-    public function forAll(Closure $p): bool;
+    public function forAll(Closure $p);
 
     /**
      * Gets the index/key of a given element. The comparison of two elements is strict,
@@ -206,7 +211,7 @@ interface ReadableCollection extends Countable, IteratorAggregate, Selectable
      *
      * @template TMaybeContained
      */
-    public function indexOf(mixed $element): int|string|false;
+    public function indexOf(mixed $element);
 
     /**
      * Returns the first element of this collection that satisfies the predicate p.
@@ -218,7 +223,7 @@ interface ReadableCollection extends Countable, IteratorAggregate, Selectable
      *               null if no element respects the predicate.
      * @phpstan-return T|null
      */
-    public function findFirst(Closure $p): mixed;
+    public function findFirst(Closure $p);
 
     /**
      * Applies iteratively the given function to each element in the collection,
@@ -227,10 +232,11 @@ interface ReadableCollection extends Countable, IteratorAggregate, Selectable
      * @phpstan-param Closure(TReturn|TInitial, T):TReturn $func
      * @phpstan-param TInitial $initial
      *
+     * @return mixed
      * @phpstan-return TReturn|TInitial
      *
      * @phpstan-template TReturn
      * @phpstan-template TInitial
      */
-    public function reduce(Closure $func, mixed $initial = null): mixed;
+    public function reduce(Closure $func, mixed $initial = null);
 }
